@@ -91,7 +91,13 @@ A MacPorts *port* is also available:
 Linux
 -----
 
-Most Linux distributions provide a package that can be installed using the
+HTTPie is available on the `Snap Store <https://snapcraft.io/httpie>`_:
+
+.. code-block:: bash
+
+    $ snap install httpie
+
+And most Linux distributions provide a package that can be installed using the
 system package manager, for example:
 
 .. code-block:: bash
