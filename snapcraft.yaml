@@ -59,6 +59,9 @@ parts:
     override-build: |
       snapcraftctl build
 
+      echo "Adding HTTPie plugins ..."
+      python -m pip install httpie-snapdsocket
+
       echo "Removing no more needed modules ..."
       python -m pip uninstall -y pip wheel
 
@@ -69,6 +72,7 @@ parts:
       packages=$SNAPCRAFT_PRIME/lib/python3.8/site-packages
       rm -rfv $packages/_distutils_hack
       rm -rfv $packages/pkg_resources/tests
+      rm -rfv $packages/requests_unixsocket/test*
       rm -rfv $packages/setuptools
 
       echo "Compiling pyc files ..."
