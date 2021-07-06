@@ -38,11 +38,9 @@ install_requires_win_only = [
 # Conditional dependencies:
 
 # sdist
-if 'bdist_wheel' not in sys.argv:
-
-    if 'win32' in str(sys.platform).lower():
-        # Terminal colors for Windows
-        install_requires.extend(install_requires_win_only)
+if 'bdist_wheel' not in sys.argv and 'win32' in str(sys.platform).lower():
+    # Terminal colors for Windows
+    install_requires.extend(install_requires_win_only)
 
 
 # bdist_wheel

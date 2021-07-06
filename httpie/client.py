@@ -120,14 +120,15 @@ def collect_messages(
             yield response
         break
 
-    if httpie_session:
-        if httpie_session.is_new() or not args.session_read_only:
-            httpie_session.cookies = requests_session.cookies
-            httpie_session.remove_cookies(
-                # TODO: take path & domain into account?
-                cookie['name'] for cookie in expired_cookies
-            )
-            httpie_session.save()
+    if httpie_session and (
+        httpie_session.is_new() or not args.session_read_only
+    ):
+        httpie_session.cookies = requests_session.cookies
+        httpie_session.remove_cookies(
+            # TODO: take path & domain into account?
+            cookie['name'] for cookie in expired_cookies
+        )
+        httpie_session.save()
 
 
 # noinspection PyProtectedMember
@@ -212,11 +213,10 @@ def make_default_headers(args: argparse.Namespace) -> RequestHeadersDict:
 
 
 def make_send_kwargs(args: argparse.Namespace) -> dict:
-    kwargs = {
+    return {
         'timeout': args.timeout or None,
         'allow_redirects': False,
     }
-    return kwargs
 
 
 def make_send_kwargs_mergeable_from_env(args: argparse.Namespace) -> dict:
@@ -225,7 +225,7 @@ def make_send_kwargs_mergeable_from_env(args: argparse.Namespace) -> dict:
         cert = args.cert
         if args.cert_key:
             cert = cert, args.cert_key
-    kwargs = {
+    return {
         'proxies': {p.key: p.value for p in args.proxy},
         'stream': True,
         'verify': {
@@ -236,7 +236,6 @@ def make_send_kwargs_mergeable_from_env(args: argparse.Namespace) -> dict:
         }.get(args.verify.lower(), args.verify),
         'cert': cert,
     }
-    return kwargs
 
 
 def make_request_kwargs(
@@ -253,13 +252,7 @@ def make_request_kwargs(
     data = args.data
     auto_json = data and not args.form
     if (args.json or auto_json) and isinstance(data, dict):
-        if data:
-            data = json.dumps(data)
-        else:
-            # We need to set data to an empty string to prevent requests
-            # from assigning an empty list to `response.request.data`.
-            data = ''
-
+        data = json.dumps(data) if data else ''
     # Finalize headers.
     headers = make_default_headers(args)
     if base_headers:
@@ -278,7 +271,7 @@ def make_request_kwargs(
             content_type=args.headers.get('Content-Type'),
         )
 
-    kwargs = {
+    return {
         'method': args.method.lower(),
         'url': args.url,
         'headers': headers,
@@ -292,8 +285,6 @@ def make_request_kwargs(
         'auth': args.auth,
         'params': args.params.items(),
     }
-
-    return kwargs
 
 
 def ensure_path_as_is(orig_url: str, prepped_url: str) -> str:
@@ -319,5 +310,4 @@ def ensure_path_as_is(orig_url: str, prepped_url: str) -> str:
         **parsed_prepped._asdict(),
         'path': parsed_orig.path,
     }
-    final_url = urlunparse(tuple(final_dict.values()))
-    return final_url
+    return urlunparse(tuple(final_dict.values()))
