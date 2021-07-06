@@ -1,5 +1,5 @@
 from socket import socket
-import multiprocessing
+from threading import Thread
 
 from flask import Flask, make_response
 
@@ -25,16 +25,9 @@ def available_port():
 
 
 def test_cookie_parser():
-    # Fix for macOS (https://github.com/pytest-dev/pytest-flask/issues/104)
-    multiprocessing.set_start_method('fork')
-
     port = available_port()
-    server = multiprocessing.Process(target=app.run, kwargs={'port': port})
+    server = Thread(target=app.run, kwargs={'port': port, 'threaded': True}, daemon=True)
     server.start()
-    try:
-        response = http(f'http://localhost:{port}/')
-        assert 'Set-Cookie: hello=world; Path=/' in response
-        assert 'Set-Cookie: oatmeal_raisin="is the best"; Path=/' in response
-    finally:
-        server.terminate()
-        server.join()
+    response = http(f'http://localhost:{port}/')
+    assert 'Set-Cookie: hello=world; Path=/' in response
+    assert 'Set-Cookie: oatmeal_raisin="is the best"; Path=/' in response
