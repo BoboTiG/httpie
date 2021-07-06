@@ -60,6 +60,7 @@ parts:
       snapcraftctl build
 
       echo "Adding HTTPie plugins ..."
+      python -m pip install httpie-unixsocket
       python -m pip install httpie-snapdsocket
 
       echo "Removing no more needed modules ..."
