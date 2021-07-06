@@ -25,10 +25,10 @@ def available_port():
 
 
 def test_cookie_parser():
-    port = 8080
+    port = available_port()
     server = Process(target=app.run, kwargs={'port': port})
+    server.start()
     try:
-        server.start()
         response = http(f'http://localhost:{port}/')
         assert 'Set-Cookie: hello=world; Path=/' in response
         assert 'Set-Cookie: oatmeal_raisin="is the best"; Path=/' in response
