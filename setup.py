@@ -12,6 +12,7 @@ tests_require = [
     'docutils',
     'pytest',
     'pytest-httpbin>=0.0.6',
+    'responses',
 ]
 dev_require = [
     *tests_require,
@@ -25,7 +26,8 @@ dev_require = [
     'wheel',
 ]
 install_requires = [
-    'requests[socks]>=2.22.0',
+    'charset_normalizer>=2.0.2',
+    'requests[socks]>=2.26.0',
     'Pygments>=2.5.2',
     'requests-toolbelt>=0.9.1',
     'setuptools',

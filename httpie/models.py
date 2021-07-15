@@ -45,6 +45,15 @@ class HTTPMessage:
 class HTTPResponse(HTTPMessage):
     """A :class:`requests.models.Response` wrapper."""
 
+    def __init__(self, orig):
+        super().__init__(orig)
+
+        # Store the future body to be able to get it and detect its encoding.
+        # Without such mechanism, as soon as the body will be fetched, it will
+        # be impossible to detect its encoding because the response will have
+        # consumed all the content.
+        self.__body = object
+
     def iter_body(self, chunk_size=1):
         return self._orig.iter_content(chunk_size=chunk_size)
 
@@ -82,13 +91,26 @@ class HTTPResponse(HTTPMessage):
 
     @property
     def encoding(self):
-        return self._orig.encoding or 'utf8'
+        """Properly detect the :class:`requests.models.Response` encoding.
+
+        The original encoding cannot be trust for several reasons, see
+        https://github.com/httpie/httpie/issues/1022 and related issues.
+
+        """
+        # Since `requests` 2.26.0, `charset_normalizer` is already used to handle
+        # encoding fallback, so lazily importing the module here is not a performance
+        # concern.
+        from charset_normalizer import detect
+
+        return detect(self.body)['encoding'] or 'utf8'
 
     @property
     def body(self):
         # Only now the response body is fetched.
         # Shouldn't be touched unless the body is actually needed.
-        return self._orig.content
+        if self.__body is object:
+            self.__body = b'' if self._orig._content_consumed else self._orig.content
+        return self.__body
 
 
 class HTTPRequest(HTTPMessage):

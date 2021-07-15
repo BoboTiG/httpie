@@ -16,10 +16,11 @@ from .utils import http, MockEnvironment
 
 class Response:
     # noinspection PyDefaultArgument
-    def __init__(self, url, headers={}, status_code=200):
+    def __init__(self, url, headers={}, status_code=200, content=None):
         self.url = url
         self.headers = CaseInsensitiveDict(headers)
         self.status_code = status_code
+        self.content = content
 
 
 class TestDownloadUtils:

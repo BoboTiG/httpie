@@ -14,6 +14,7 @@ This project adheres to `Semantic Versioning <https://semver.org/>`_.
 * Fixed ``--continue --download`` with a single byte to be downloaded left. (`#1032`_)
 * Fixed ``--verbose`` HTTP 307 redirects with streamed request body. (`#1088`_)
 * Add internal support for file-like object responses to improve adapter plugin support. (`#1094`_)
+* Improved handling of responses without correct content-type charset. (`#1022`_)
 
 
 `2.4.0`_ (2021-02-06)

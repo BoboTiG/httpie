@@ -3,6 +3,7 @@ import io
 from unittest import mock
 
 import pytest
+import responses
 
 import httpie
 import httpie.__main__
@@ -218,3 +219,21 @@ def test_json_input_preserve_order(httpbin_both):
     assert HTTP_OK in r
     assert r.json['data'] == \
         '{"order": {"map": {"1": "first", "2": "second"}}}'
+
+
+@responses.activate
+def test_GET_encoding_detection_from_content():
+    url = 'http://example.org'  # Note: URL never fetched
+    body = '<?xml version="1.0" encoding="UTF-8"?><category>Financiën</category>'.encode('utf8')
+    responses.add(responses.GET, url, body=body, content_type='text/xml')
+    r = http('GET', url)
+    assert 'Financiën' in r
+
+
+@responses.activate
+def test_POST_encoding_detection_from_content():
+    url = 'http://example.org'  # Note: URL never fetched
+    body = 'Všichni lidé jsou si rovni.'.encode('utf8')
+    responses.add(responses.POST, url, body=body, content_type='text/plain')
+    r = http('--form', 'POST', url)
+    assert 'Všichni lidé jsou si rovni.' in r

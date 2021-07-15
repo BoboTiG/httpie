@@ -22,12 +22,12 @@ VERSIONS = {
 PACKAGES = [
     'httpie',
     'Pygments',
+    'charset_normalizer',
     'requests',
     'requests-toolbelt',
     'certifi',
     'urllib3',
     'idna',
-    'chardet',
     'PySocks',
 ]
 
